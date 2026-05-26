@@ -417,13 +417,18 @@ const FIREBASE_URL = "https://qcs-tournament-default-rtdb.firebaseio.com";
 // Save state to Firebase
 async function saveToFirebase(state) {
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
     await fetch(FIREBASE_URL + "/qcs_state.json", {
       method: "PUT",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(state)
+      body: JSON.stringify(state),
+      signal: controller.signal
     });
+    clearTimeout(timeout);
   } catch(e) {
     console.warn("Firebase save failed, using localStorage only:", e);
+    throw e; // re-throw so caller can show error status
   }
 }
 
@@ -604,9 +609,9 @@ function confirmWinner(){
   if(g.loserSlot)bracketSlots[g.loserSlot]=lk;
   if(poolDone())computeSeedings();
   closeModal('modalWin');
+  render(); // render immediately — don't wait for Firebase
   updateSyncStatus('pending');
   saveState().then(()=>updateSyncStatus('ok')).catch(()=>updateSyncStatus('err'));
-  render();
 }
 
 function openNoShow(gid,tSlot){
@@ -636,9 +641,9 @@ function confirmNoShow(){
   });
   if(poolDone())computeSeedings();
   closeModal('modalNS');
+  render(); // render immediately
   updateSyncStatus('pending');
   saveState().then(()=>updateSyncStatus('ok')).catch(()=>updateSyncStatus('err'));
-  render();
 }
 
 function undoResult(gid){
@@ -648,9 +653,9 @@ function undoResult(gid){
   if(g.loserSlot)delete bracketSlots[g.loserSlot];
   if(g.phase===0){poolRecords[r.winnerKey].w--;poolRecords[r.loserKey].l--;}
   delete results[gid];
+  render(); // render immediately
   updateSyncStatus('pending');
   saveState().then(()=>updateSyncStatus('ok')).catch(()=>updateSyncStatus('err'));
-  render();
 }
 
 function closeModal(id){
