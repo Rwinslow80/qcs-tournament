@@ -215,8 +215,6 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
     </div>
     <div class="stitle" id="needsLbl">🟡 NEEDS RESULT</div>
     <div id="activeGames"></div>
-    <div class="stitle" id="doneLbl">✅ COMPLETED</div>
-    <div id="doneGames"></div>
     <div class="stitle">⏳ WAITING ON EARLIER RESULTS</div>
     <div id="waitGames"></div>
   </div>
@@ -239,6 +237,11 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
   <div id="page-teams" class="page">
     <div class="help-box">Find any team to see their next game.</div>
     <div id="teamList"></div>
+  </div>
+
+  <div id="page-scores" class="page">
+    <div class="help-box">All completed games. Tap ↩️ Undo to correct a mistake — it will sync to all devices.</div>
+    <div id="scoresList"></div>
   </div>
 
   <div id="page-settings" class="page">
@@ -268,6 +271,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 
 <div class="bottom-nav">
   <button class="nbtn active" id="nav-entry" onclick="showPage('entry')"><span class="ic">📋</span>Enter</button>
+  <button class="nbtn" id="nav-scores" onclick="showPage('scores')"><span class="ic">🏆</span>Scores</button>
   <button class="nbtn" id="nav-standings" onclick="showPage('standings')"><span class="ic">📊</span>Standings</button>
   <button class="nbtn" id="nav-teams" onclick="showPage('teams')"><span class="ic">🏓</span>Teams</button>
   <button class="nbtn" id="nav-settings" onclick="showPage('settings')"><span class="ic">⚙️</span>Settings</button>
@@ -280,9 +284,24 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
     <h3>Confirm Winner</h3>
     <p id="mWinDesc"></p>
     <span class="modal-team mt-win" id="mWinTeam"></span>
+    <div id="scoreEntrySection" style="margin-bottom:14px;">
+      <div style="font-size:0.72rem;font-weight:800;color:#555;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Enter Score <span id="scoreRequired" style="color:#ff3b30;display:none">— required for pool play tiebreakers</span></div>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;">
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <span id="scoreWinnerLabel" style="font-size:0.68rem;font-weight:800;color:#1a7a35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></span>
+          <input id="scoreWinner" type="number" min="0" max="99" placeholder="11" style="padding:10px;border-radius:8px;border:2px solid #34c759;font-family:Nunito,sans-serif;font-size:1.3rem;font-weight:900;text-align:center;width:100%;outline:none;">
+        </div>
+        <span style="font-size:1rem;font-weight:900;color:#aaa;text-align:center;">—</span>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <span id="scoreLoserLabel" style="font-size:0.68rem;font-weight:800;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;"></span>
+          <input id="scoreLoser" type="number" min="0" max="99" placeholder="?" style="padding:10px;border-radius:8px;border:2px solid #ddd;font-family:Nunito,sans-serif;font-size:1.3rem;font-weight:900;text-align:center;width:100%;outline:none;">
+        </div>
+      </div>
+      <div id="scoreWarning" style="color:#ff3b30;font-size:0.7rem;font-weight:700;margin-top:6px;display:none;">Please enter the score for pool play games — needed for tiebreakers</div>
+    </div>
     <div class="modal-actions">
       <button class="mbtn mbtn-no" onclick="closeModal('modalWin')">← Go back</button>
-      <button class="mbtn mbtn-yes" onclick="confirmWinner()">✅ Yes, correct!</button>
+      <button class="mbtn mbtn-yes" onclick="confirmWinner()">✅ Confirm</button>
     </div>
   </div>
 </div>
@@ -533,17 +552,59 @@ let pendingWin=null,pendingGame=null,pendingNS=null;
 function recordWinner(gid,wSlot){
   const g=GAMES.find(x=>x.id===gid);
   pendingWin=wSlot; pendingGame=g;
+  const lSlot=g.teamA===wSlot?g.teamB:g.teamA;
   document.getElementById('mWinDesc').textContent=g.label+' · '+g.time+' · Court '+g.court;
   document.getElementById('mWinTeam').textContent='🏆 '+tn(wSlot);
+  // Score fields
+  document.getElementById('scoreWinner').value='';
+  document.getElementById('scoreLoser').value='';
+  document.getElementById('scoreWarning').style.display='none';
+  document.getElementById('scoreWinnerLabel').textContent=tn(wSlot);
+  document.getElementById('scoreLoserLabel').textContent=tn(lSlot);
+  // Pool play — score required for tiebreakers
+  const isPool = g.phase===0;
+  document.getElementById('scoreRequired').style.display=isPool?'inline':'none';
+  document.getElementById('scoreEntrySection').style.display='block';
   document.getElementById('modalWin').classList.add('show');
+  // Focus winner score field
+  setTimeout(()=>document.getElementById('scoreWinner').focus(),300);
 }
 
 function confirmWinner(){
   const g=pendingGame,ws=pendingWin;
   const ls=g.teamA===ws?g.teamB:g.teamA;
   const wk=bracketSlots[ws]||ws,lk=bracketSlots[ls]||ls;
-  results[g.id]={winner:ws,loser:ls,winnerKey:wk,loserKey:lk};
-  if(g.phase===0){poolRecords[wk].w++;poolRecords[lk].l++;}
+
+  // Read scores
+  const wScore = parseInt(document.getElementById('scoreWinner').value)||null;
+  const lScore = parseInt(document.getElementById('scoreLoser').value)||null;
+
+  // Pool play: warn if scores missing but don't block
+  if(g.phase===0 && (wScore===null||lScore===null)){
+    document.getElementById('scoreWarning').style.display='block';
+    // Allow 1 second then proceed anyway so it never blocks
+    // But show warning — user can re-click confirm to proceed
+    if(!pendingGame._scoreWarned){
+      pendingGame._scoreWarned=true;
+      return;
+    }
+  }
+
+  // Calculate point differential (capped at ±11 per game)
+  let pd=0;
+  if(wScore!==null && lScore!==null){
+    const raw = wScore - lScore;
+    pd = Math.max(-11, Math.min(11, raw));
+  }
+
+  results[g.id]={winner:ws,loser:ls,winnerKey:wk,loserKey:lk,
+    winScore:wScore,loseScore:lScore};
+  if(g.phase===0){
+    poolRecords[wk].w++;
+    poolRecords[lk].l++;
+    poolRecords[wk].pd += pd;
+    poolRecords[lk].pd -= pd;
+  }
   if(g.winnerSlot)bracketSlots[g.winnerSlot]=wk;
   if(g.loserSlot)bracketSlots[g.loserSlot]=lk;
   if(poolDone())computeSeedings();
@@ -597,7 +658,18 @@ function undoResult(gid){
   render();
 }
 
-function closeModal(id){document.getElementById(id).classList.remove('show');}
+function closeModal(id){
+  document.getElementById(id).classList.remove('show');
+  if(id==='modalWin' && pendingGame) pendingGame._scoreWarned=false;
+}
+
+// Allow pressing Enter on score fields to confirm
+document.addEventListener('DOMContentLoaded',()=>{
+  ['scoreWinner','scoreLoser'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('keydown',e=>{if(e.key==='Enter')confirmWinner();});
+  });
+});
 
 function nextGameDesc(slotKey){
   const ng=GAMES.find(g=>!gameDone(g)&&(g.teamA===slotKey||g.teamB===slotKey));
@@ -693,11 +765,49 @@ function curPhase(){
   return Math.min(...inc.map(g=>g.phase));
 }
 
+function renderScores(){
+  const el = document.getElementById('scoresList');
+  if(!el) return;
+  const done = GAMES.filter(g=>gameDone(g)).reverse();
+  if(!done.length){
+    el.innerHTML='<div class="empty-state">No results recorded yet.</div>';
+    return;
+  }
+  const cbClass = c => `cb${c}`;
+  el.innerHTML = done.map(g=>{
+    const r=results[g.id];
+    if(!r) return '';
+    const wn=tn(r.winner), ln=tn(r.loser);
+    return `<div class="gcard done" style="opacity:1;border-color:#ddd">
+      <div class="gcard-hdr">
+        <span class="cbadge ${cbClass(g.court)}">Court ${g.court}</span>
+        <span class="gtime">${g.time}</span>
+        <span class="glabel">${g.label}</span>
+        <span class="sdot done"></span>
+      </div>
+      <div class="pick">
+        <div class="tbns">
+          <button class="tbtn winner" disabled>${wn}${r.forfeit?' (bye)':''}</button>
+          <span class="vsdiv" style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+            ${r.winScore!=null&&r.loseScore!=null?`<span style="font-size:0.9rem;font-weight:900;color:#333">${r.winScore}–${r.loseScore}</span>`:'<span style="font-size:0.7rem;color:#aaa">🏆</span>'}
+          </span>
+          <button class="tbtn loser" disabled>${ln}${r.forfeit?' 🚫':''}</button>
+        </div>
+        <div class="next-chip nc-w" style="margin-top:8px"><span class="nc-icon">➡️</span><div class="nc-txt"><strong>${wn} next:</strong>${nextGameDesc(r.winner)}</div></div>
+        <div class="next-chip nc-l"><span class="nc-icon">➡️</span><div class="nc-txt"><strong>${ln} next:</strong>${nextGameDesc(r.loser)}</div></div>
+        <button class="undo-btn" onclick="undoResult('${g.id}')">↩️ Undo this result</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function renderGames(){
   const active=[],done=[],wait=[];
   GAMES.forEach(g=>{if(gameDone(g))done.push(g);else if(gameReady(g))active.push(g);else wait.push(g);});
   document.getElementById('needsLbl').textContent=`🟡 NEEDS RESULT (${active.length})`;
-  document.getElementById('doneLbl').textContent=`✅ COMPLETED (${done.length})`;
+  // Update scores tab badge
+  const scoresNav = document.getElementById('nav-scores');
+  if(scoresNav) scoresNav.querySelector('.ic').textContent = done.length > 0 ? `🏆` : '🏆';
   const total=GAMES.length,pct=Math.round(done.length/total*100);
   document.getElementById('progPct').textContent=pct+'%';
   document.getElementById('progFill').style.width=pct+'%';
@@ -710,7 +820,6 @@ function renderGames(){
   const ph=curPhase();
   pills.forEach((p,i)=>{p.classList.remove('active','done');if(i===ph)p.classList.add('active');else if(i<ph)p.classList.add('done');});
   document.getElementById('activeGames').innerHTML=active.length?active.map(renderGameCard).join(''):'<div class="empty-state">🎉 No games pending right now!</div>';
-  document.getElementById('doneGames').innerHTML=done.length?done.slice(-5).reverse().map(renderGameCard).join(''):'<div style="color:var(--text3);font-size:0.78rem;font-weight:600;padding:5px 0">None yet</div>';
   document.getElementById('waitGames').innerHTML=wait.slice(0,6).map(renderGameCard).join('');
 }
 
@@ -731,10 +840,11 @@ function renderStandings(){
       else if(!ng){nl='Done';nc='sn-d';}
       else if(gameReady(ng)){nl=`C${ng.court} · ${ng.time}`;nc='sn-p';}
       else{nl='Waiting';nc='sn-w';}
+      const pdStr = r.pd>0?`+${r.pd}`:r.pd===0?'0':`${r.pd}`;
       return `<div class="srow${ns?' ns-row':''}">
         <span class="s-pos">${i+1}</span>
         <span>${TEAMS[k]}</span>
-        <span class="s-rec">${r.w}–${r.l}</span>
+        <span class="s-rec">${r.w}–${r.l}<br><span style="font-size:0.6rem;color:#aaa">pd: ${pdStr}</span></span>
         <span class="s-next ${nc}">${nl}</span>
       </div>`;
     }).join('');
@@ -760,7 +870,7 @@ function renderTeams(){
   }).join('');
 }
 
-function render(){renderCourtGrid();renderGames();renderStandings();renderTeams();}
+function render(){renderCourtGrid();renderGames();renderStandings();renderTeams();renderScores();}
 
 function showPage(n){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
