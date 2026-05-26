@@ -566,8 +566,9 @@ function recordWinner(gid,wSlot){
   document.getElementById('scoreRequired').style.display=isPool?'inline':'none';
   document.getElementById('scoreEntrySection').style.display='block';
   document.getElementById('modalWin').classList.add('show');
-  // Focus winner score field
-  setTimeout(()=>document.getElementById('scoreWinner').focus(),300);
+  // Default winner to 11, focus loser score box
+  document.getElementById('scoreWinner').value='11';
+  setTimeout(()=>document.getElementById('scoreLoser').focus(),300);
 }
 
 function confirmWinner(){
@@ -579,15 +580,9 @@ function confirmWinner(){
   const wScore = parseInt(document.getElementById('scoreWinner').value)||null;
   const lScore = parseInt(document.getElementById('scoreLoser').value)||null;
 
-  // Pool play: warn if scores missing but don't block
-  if(g.phase===0 && (wScore===null||lScore===null)){
+  // Pool play: warn if loser score missing but don't block
+  if(g.phase===0 && lScore===null){
     document.getElementById('scoreWarning').style.display='block';
-    // Allow 1 second then proceed anyway so it never blocks
-    // But show warning — user can re-click confirm to proceed
-    if(!pendingGame._scoreWarned){
-      pendingGame._scoreWarned=true;
-      return;
-    }
   }
 
   // Calculate point differential (capped at ±11 per game)
@@ -660,7 +655,6 @@ function undoResult(gid){
 
 function closeModal(id){
   document.getElementById(id).classList.remove('show');
-  if(id==='modalWin' && pendingGame) pendingGame._scoreWarned=false;
 }
 
 // Allow pressing Enter on score fields to confirm
