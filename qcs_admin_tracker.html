@@ -234,6 +234,16 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
     </div>
   </div>
 
+  <!-- Bracket Seeds — shown after pool play complete -->
+  <div id="bracketSeedsSection" style="display:none">
+    <div class="stitle" style="margin-top:16px">SOCIAL BRACKET SEEDS</div>
+    <div class="standings-panel" id="socialSeedsPanel"></div>
+    <div class="stitle" style="margin-top:14px">ADVANCED BRACKET SEEDS</div>
+    <div class="standings-panel" id="advSeedsPanel"></div>
+  </div>
+
+  </div>
+
   <div id="page-teams" class="page">
     <div class="help-box">Find any team to see their next game.</div>
     <div id="teamList"></div>
@@ -818,8 +828,11 @@ function renderGames(){
   const pills=document.querySelectorAll('.pp');
   const ph=curPhase();
   pills.forEach((p,i)=>{p.classList.remove('active','done');if(i===ph)p.classList.add('active');else if(i<ph)p.classList.add('done');});
+  // Sort active games chronologically by block then court
+  active.sort((a,b)=> a.block!==b.block ? a.block-b.block : a.court-b.court);
   document.getElementById('activeGames').innerHTML=active.length?active.map(renderGameCard).join(''):'<div class="empty-state">🎉 No games pending right now!</div>';
-  document.getElementById('waitGames').innerHTML=wait.slice(0,6).map(renderGameCard).join('');
+  wait.sort((a,b)=> a.block!==b.block ? a.block-b.block : a.court-b.court);
+  document.getElementById('waitGames').innerHTML=wait.slice(0,8).map(renderGameCard).join('');
 }
 
 function renderStandings(){
@@ -869,7 +882,55 @@ function renderTeams(){
   }).join('');
 }
 
-function render(){renderCourtGrid();renderGames();renderStandings();renderTeams();renderScores();}
+function renderBracketSeeds(){
+  const done = poolDone();
+  const section = document.getElementById('bracketSeedsSection');
+  if(!section) return;
+  section.style.display = done ? 'block' : 'none';
+  if(!done) return;
+
+  // Social seeds S1-S8
+  const socialEl = document.getElementById('socialSeedsPanel');
+  let sHtml = '<div class="sp-title">Seeds 1–8</div>';
+  for(let i=1;i<=8;i++){
+    const k = bracketSlots[`S_SEED_${i}`];
+    const name = k ? TEAMS[k] : '—';
+    // Find their R1 game
+    const r1 = GAMES.find(g=>g.phase===1&&(g.teamA===`S_SEED_${i}`||g.teamB===`S_SEED_${i}`));
+    const opp = r1 ? (r1.teamA===`S_SEED_${i}`?r1.teamB:r1.teamA) : null;
+    const oppName = opp ? tn(opp) : '—';
+    const matchInfo = r1 ? `Court ${r1.court} · ${r1.time}` : '';
+    sHtml += `<div class="srow" style="grid-template-columns:26px 1fr 1fr 80px">
+      <span class="s-pos" style="background:var(--social-light);color:var(--social);border-radius:3px;font-weight:900">S${i}</span>
+      <span style="font-weight:800">${name}</span>
+      <span style="font-size:0.7rem;color:var(--text3)">vs ${oppName}</span>
+      <span class="s-next sn-p">${matchInfo}</span>
+    </div>`;
+  }
+  if(socialEl) socialEl.innerHTML = sHtml;
+
+  // Advanced seeds 1-16
+  const advEl = document.getElementById('advSeedsPanel');
+  let aHtml = '<div class="sp-title">Seeds 1–16</div>';
+  for(let i=1;i<=16;i++){
+    const k = bracketSlots[`A_SEED_${i}`];
+    const name = k ? TEAMS[k] : '—';
+    const r1 = GAMES.find(g=>g.phase===1&&(g.teamA===`A_SEED_${i}`||g.teamB===`A_SEED_${i}`));
+    const opp = r1 ? (r1.teamA===`A_SEED_${i}`?r1.teamB:r1.teamA) : null;
+    const oppName = opp ? tn(opp) : '—';
+    const matchInfo = r1 ? `Court ${r1.court} · ${r1.time}` : '';
+    const bgStyle = i<=4?'background:rgba(232,115,90,0.08)':i<=8?'background:rgba(15,82,186,0.05)':'';
+    aHtml += `<div class="srow" style="grid-template-columns:26px 1fr 1fr 80px;${bgStyle}">
+      <span class="s-pos" style="background:var(--adv-light);color:var(--adv);border-radius:3px;font-weight:900">${i}</span>
+      <span style="font-weight:800">${name}</span>
+      <span style="font-size:0.7rem;color:var(--text3)">vs ${oppName}</span>
+      <span class="s-next sn-p">${matchInfo}</span>
+    </div>`;
+  }
+  if(advEl) advEl.innerHTML = aHtml;
+}
+
+function render(){renderCourtGrid();renderGames();renderStandings();renderTeams();renderScores();renderBracketSeeds();}
 
 function showPage(n){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
