@@ -420,65 +420,89 @@ const GAMES = [
 
 const FIREBASE_URL = "https://qcs-tournament-default-rtdb.firebaseio.com";
 
-// Save state to Firebase
+// Save to Firebase with retry
 async function saveToFirebase(state) {
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
-    await fetch(FIREBASE_URL + "/qcs_state.json", {
-      method: "PUT",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(state),
-      signal: controller.signal
-    });
-    clearTimeout(timeout);
-  } catch(e) {
-    console.warn("Firebase save failed, using localStorage only:", e);
-    throw e; // re-throw so caller can show error status
-  }
-}
-
-// Load state from Firebase
-async function loadFromFirebase() {
-  try {
-    const resp = await fetch(FIREBASE_URL + "/qcs_state.json");
-    if (!resp.ok) return null;
-    return await resp.json();
-  } catch(e) {
-    console.warn("Firebase load failed:", e);
-    return null;
-  }
-}
-
-function saveState() {
-  const state = {
-    results,
-    bracketSlots,
-    poolRecords,
-    noShows: [...noShows],
-    lastUpdated: new Date().toISOString()
-  };
-  // Save to both localStorage and Firebase
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
-  saveToFirebase(state);
-}
-
-async function loadState() {
-  // Try Firebase first, fall back to localStorage
-  let state = await loadFromFirebase();
-  if (!state) {
+  for(let attempt=1; attempt<=3; attempt++){
     try {
-      const s = localStorage.getItem(STORAGE_KEY);
-      if (s) state = JSON.parse(s);
-    } catch(e) {}
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+      const resp = await fetch(FIREBASE_URL + "/qcs_state.json", {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(state),
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+      if(resp.ok) return true;
+    } catch(e) {
+      console.warn("Firebase save attempt " + attempt + " failed:", e);
+      if(attempt < 3) await new Promise(r=>setTimeout(r, 1000));
+    }
   }
-  if (!state) return;
+  throw new Error("Firebase save failed after 3 attempts");
+}
+
+// Load from Firebase with retry
+async function loadFromFirebase() {
+  for(let attempt=1; attempt<=3; attempt++){
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+      const resp = await fetch(FIREBASE_URL + "/qcs_state.json", {
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+      if(resp.ok){
+        const data = await resp.json();
+        return data;
+      }
+    } catch(e) {
+      console.warn("Firebase load attempt " + attempt + " failed:", e);
+      if(attempt < 3) await new Promise(r=>setTimeout(r, 1000));
+    }
+  }
+  return null;
+}
+
+function applyState(state){
+  if(!state) return false;
   results = state.results || {};
   bracketSlots = state.bracketSlots || {};
   poolRecords = state.poolRecords || {};
   noShows = new Set(state.noShows || []);
-  // Also sync to localStorage
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+  return true;
+}
+
+function saveState() {
+  const state = {
+    results, bracketSlots, poolRecords,
+    noShows: [...noShows],
+    lastUpdated: new Date().toISOString()
+  };
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+  return saveToFirebase(state);
+}
+
+async function loadState() {
+  // 1. Load localStorage immediately so UI renders fast
+  try {
+    const s = localStorage.getItem(STORAGE_KEY);
+    if(s){ applyState(JSON.parse(s)); render(); }
+  } catch(e) {}
+  // 2. Then fetch Firebase in background — overrides localStorage if newer
+  const fbState = await loadFromFirebase();
+  if(fbState){
+    const fbTime = fbState.lastUpdated || "";
+    let localTime = "";
+    try { localTime = JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}").lastUpdated||""; } catch(e){}
+    // Use Firebase if it has data and is newer (or local is empty)
+    if(!localTime || fbTime >= localTime || Object.keys(fbState.results||{}).length >= Object.keys(results).length){
+      applyState(fbState);
+      return true;
+    }
+  }
+  return false;
 }
 
 
@@ -971,12 +995,21 @@ async function confirmReset(){
   }
 }
 
-// Init
+// Init — render from localStorage first, then sync Firebase
 async function initApp(){
-  await loadState();
+  // Render immediately from localStorage so app is usable instantly
+  try {
+    const s = localStorage.getItem(STORAGE_KEY);
+    if(s){ const d=JSON.parse(s); results=d.results||{}; bracketSlots=d.bracketSlots||{}; poolRecords=d.poolRecords||{}; noShows=new Set(d.noShows||[]); }
+  } catch(e){}
   if(poolDone())computeSeedings();
   render();
-  updateSyncStatus('ok');
+  updateSyncStatus('pending');
+  // Then load from Firebase in background
+  const ok = await loadState();
+  if(poolDone())computeSeedings();
+  render();
+  updateSyncStatus(ok?'ok':'err');
 }
 </script>
 </body>

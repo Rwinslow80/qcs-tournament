@@ -288,28 +288,45 @@ function initR(){ Object.keys(TEAMS).forEach(k=>poolRecords[k]={w:0,l:0,pd:0}); 
 initR();
 
 async function loadFromFirebase(){
-  try{
-    const resp = await fetch(FIREBASE_URL + "/qcs_state.json");
-    if(!resp.ok) return null;
-    return await resp.json();
-  } catch(e){ return null; }
+  for(let attempt=1; attempt<=3; attempt++){
+    try{
+      const controller = new AbortController();
+      const timeout = setTimeout(()=>controller.abort(), 10000);
+      const resp = await fetch(FIREBASE_URL + "/qcs_state.json", {signal: controller.signal});
+      clearTimeout(timeout);
+      if(resp.ok) return await resp.json();
+    } catch(e){
+      console.warn("Firebase load attempt "+attempt+" failed:", e);
+      if(attempt<3) await new Promise(r=>setTimeout(r,1000));
+    }
+  }
+  return null;
 }
 
-async function loadState(){
-  let state = await loadFromFirebase();
-  if(!state){
-    // fallback to localStorage
-    try{
-      const s = localStorage.getItem(STORAGE_KEY);
-      if(s) state = JSON.parse(s);
-    } catch(e){}
-  }
+function applyState(state){
   if(!state) return false;
   results = state.results||{};
   bracketSlots = state.bracketSlots||{};
   poolRecords = state.poolRecords||{};
   noShows = new Set(state.noShows||[]);
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
   return true;
+}
+
+async function loadState(){
+  // Load localStorage first for instant render
+  try{
+    const s = localStorage.getItem(STORAGE_KEY);
+    if(s) applyState(JSON.parse(s));
+  } catch(e){}
+  // Then get Firebase — use whichever has more results
+  const fb = await loadFromFirebase();
+  if(fb){
+    const fbCount = Object.keys(fb.results||{}).length;
+    const lcCount = Object.keys(results||{}).length;
+    if(fbCount >= lcCount){ applyState(fb); return true; }
+  }
+  return Object.keys(results).length > 0;
 }
 
 function tn(k){
@@ -545,6 +562,8 @@ function renderBracketSeeds(){
 }
 
 async function refresh(){
+  // Render from cache first so board updates instantly
+  renderCourts(); renderTeamsList(); renderStandings(); renderBracketSeeds();
   const ok = await loadState();
   if(poolDone()) computeSeedings();
   renderCourts();
