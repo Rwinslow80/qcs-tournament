@@ -126,7 +126,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
   <div class="hero-meta">
     <span class="hmeta">🪸 Social: C2 &amp; C5</span>
     <span class="hmeta">💙 Advanced: C3,6,7,8,9</span>
-    <span class="hmeta">⭐ Raffle 1pm &amp; 2:30pm</span>
+    <span class="hmeta">⭐ Raffle 12:45pm &amp; 3:00pm</span>
     <span class="hmeta">⚠️ C1 &amp; C4 not used</span>
   </div>
 </div>
@@ -244,15 +244,15 @@ const GAMES = [
   {id:"ad_pp4",block:4,time:"11:45am",court:8,div:"advanced",phase:0,label:"Adv Pool D · Rd 4",teamA:"AD2",teamB:"AD4",winnerSlot:null,loserSlot:null},
   {id:"ad_pp5",block:5,time:"12:00pm",court:8,div:"advanced",phase:0,label:"Adv Pool D · Rd 5",teamA:"AD1",teamB:"AD4",winnerSlot:null,loserSlot:null},
   {id:"ad_pp6",block:6,time:"12:15pm",court:8,div:"advanced",phase:0,label:"Adv Pool D · Rd 6",teamA:"AD2",teamB:"AD3",winnerSlot:null,loserSlot:null},
-  {id:"sr1_1",block:8,time:"12:45pm",court:2,div:"social",phase:1,label:"Social Bracket R1",teamA:"S_SEED_1",teamB:"S_SEED_8",winnerSlot:"S_W1",loserSlot:"S_L1"},
-  {id:"sr1_2",block:8,time:"12:45pm",court:5,div:"social",phase:1,label:"Social Bracket R1",teamA:"S_SEED_4",teamB:"S_SEED_5",winnerSlot:"S_W2",loserSlot:"S_L2"},
+  {id:"sr1_1",block:8,time:"1:00pm",court:2,div:"social",phase:1,label:"Social Bracket R1",teamA:"S_SEED_1",teamB:"S_SEED_8",winnerSlot:"S_W1",loserSlot:"S_L1"},
+  {id:"sr1_2",block:8,time:"1:00pm",court:5,div:"social",phase:1,label:"Social Bracket R1",teamA:"S_SEED_4",teamB:"S_SEED_5",winnerSlot:"S_W2",loserSlot:"S_L2"},
   {id:"sr1_3",block:10,time:"1:15pm",court:2,div:"social",phase:1,label:"Social Bracket R1",teamA:"S_SEED_2",teamB:"S_SEED_7",winnerSlot:"S_W3",loserSlot:"S_L3"},
   {id:"sr1_4",block:10,time:"1:15pm",court:5,div:"social",phase:1,label:"Social Bracket R1",teamA:"S_SEED_3",teamB:"S_SEED_6",winnerSlot:"S_W4",loserSlot:"S_L4"},
-  {id:"ar1_1",block:8,time:"12:45pm",court:3,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_1",teamB:"A_SEED_16",winnerSlot:"A_W1",loserSlot:"A_L1"},
-  {id:"ar1_2",block:8,time:"12:45pm",court:6,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_8",teamB:"A_SEED_9",winnerSlot:"A_W2",loserSlot:"A_L2"},
-  {id:"ar1_3",block:8,time:"12:45pm",court:7,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_5",teamB:"A_SEED_12",winnerSlot:"A_W3",loserSlot:"A_L3"},
-  {id:"ar1_4",block:8,time:"12:45pm",court:8,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_4",teamB:"A_SEED_13",winnerSlot:"A_W4",loserSlot:"A_L4"},
-  {id:"ar1_5",block:8,time:"12:45pm",court:9,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_2",teamB:"A_SEED_15",winnerSlot:"A_W5",loserSlot:"A_L5"},
+  {id:"ar1_1",block:8,time:"1:00pm",court:3,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_1",teamB:"A_SEED_16",winnerSlot:"A_W1",loserSlot:"A_L1"},
+  {id:"ar1_2",block:8,time:"1:00pm",court:6,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_8",teamB:"A_SEED_9",winnerSlot:"A_W2",loserSlot:"A_L2"},
+  {id:"ar1_3",block:8,time:"1:00pm",court:7,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_5",teamB:"A_SEED_12",winnerSlot:"A_W3",loserSlot:"A_L3"},
+  {id:"ar1_4",block:8,time:"1:00pm",court:8,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_4",teamB:"A_SEED_13",winnerSlot:"A_W4",loserSlot:"A_L4"},
+  {id:"ar1_5",block:8,time:"1:00pm",court:9,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_2",teamB:"A_SEED_15",winnerSlot:"A_W5",loserSlot:"A_L5"},
   {id:"ar1_6",block:10,time:"1:15pm",court:3,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_7",teamB:"A_SEED_10",winnerSlot:"A_W6",loserSlot:"A_L6"},
   {id:"ar1_7",block:10,time:"1:15pm",court:6,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_6",teamB:"A_SEED_11",winnerSlot:"A_W7",loserSlot:"A_L7"},
   {id:"ar1_8",block:10,time:"1:15pm",court:7,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_3",teamB:"A_SEED_14",winnerSlot:"A_W8",loserSlot:"A_L8"},
@@ -332,8 +332,26 @@ function computeSeedings(){
       if(rb.w!==ra.w)return rb.w-ra.w; return rb.pd-ra.pd;
     });
   });
+  // Sort within each finish tier across pools — fixes cross-pool seeding
+  const sPools=['SA','SB'];
   const sRanked=[];
-  for(let i=0;i<4;i++){if(sorted.SA[i])sRanked.push(sorted.SA[i]);if(sorted.SB[i])sRanked.push(sorted.SB[i]);}
+  for(let tier=0;tier<4;tier++){
+    const g=[];
+    sPools.forEach(p=>{if(sorted[p][tier])g.push(sorted[p][tier]);});
+    g.sort((a,b)=>{const ra=poolRecords[a],rb=poolRecords[b];if(rb.w!==ra.w)return rb.w-ra.w;return rb.pd-ra.pd;});
+    g.forEach(k=>sRanked.push(k));
+  }
+  sRanked.forEach((k,i)=>{bracketSlots[`S_SEED_${i+1}`]=k;});
+  const aPools=['AA','AB','AC','AD'];
+  const aRanked=[];
+  for(let tier=0;tier<4;tier++){
+    const g=[];
+    aPools.forEach(p=>{if(sorted[p][tier])g.push(sorted[p][tier]);});
+    g.sort((a,b)=>{const ra=poolRecords[a],rb=poolRecords[b];if(rb.w!==ra.w)return rb.w-ra.w;return rb.pd-ra.pd;});
+    g.forEach(k=>aRanked.push(k));
+  }
+  aRanked.forEach((k,i)=>{bracketSlots[`A_SEED_${i+1}`]=k;});
+}
   sRanked.forEach((k,i)=>{bracketSlots[`S_SEED_${i+1}`]=k;});
   const aRanked=[];
   for(let i=0;i<4;i++){['AA','AB','AC','AD'].forEach(pool=>{if(sorted[pool][i])aRanked.push(sorted[pool][i]);});}
@@ -486,7 +504,7 @@ function renderBracketSeeds(){
 
   // Social seeds
   const sEl = document.getElementById('pbSocialSeeds');
-  let sHtml = `<div class="pool-card"><div class="pool-hdr">Seeds 1–8 · Bracket R1 at 12:45pm</div>`;
+  let sHtml = `<div class="pool-card"><div class="pool-hdr">Seeds 1–8 · Bracket R1 at 1:00pm</div>`;
   for(let i=1;i<=8;i++){
     const k = bracketSlots[`S_SEED_${i}`];
     const name = k ? TEAMS[k] : 'TBD';
@@ -506,7 +524,7 @@ function renderBracketSeeds(){
 
   // Advanced seeds
   const aEl = document.getElementById('pbAdvSeeds');
-  let aHtml = `<div class="pool-card"><div class="pool-hdr">Seeds 1–16 · Bracket R1 at 12:45pm &amp; 1:15pm</div>`;
+  let aHtml = `<div class="pool-card"><div class="pool-hdr">Seeds 1–16 · Bracket R1 at 1:00pm &amp; 1:15pm</div>`;
   for(let i=1;i<=16;i++){
     const k = bracketSlots[`A_SEED_${i}`];
     const name = k ? TEAMS[k] : 'TBD';

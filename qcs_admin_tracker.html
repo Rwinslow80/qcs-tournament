@@ -191,7 +191,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
     <div class="pp">Pool Play</div>
     <div class="pp">Bracket R1</div>
     <div class="pp">QF / Consol</div>
-    <div class="pp">Placement</div>
+    <div class="pp">SF / Placement</div>
     <div class="pp">Finals</div>
   </div>
 </div>
@@ -380,15 +380,15 @@ const GAMES = [
   {id:"ad_pp4",block:4,time:"11:45am",court:8,div:"advanced",phase:0,label:"Adv Pool D · Rd 4",teamA:"AD2",teamB:"AD4",winnerSlot:null,loserSlot:null},
   {id:"ad_pp5",block:5,time:"12:00pm",court:8,div:"advanced",phase:0,label:"Adv Pool D · Rd 5",teamA:"AD1",teamB:"AD4",winnerSlot:null,loserSlot:null},
   {id:"ad_pp6",block:6,time:"12:15pm",court:8,div:"advanced",phase:0,label:"Adv Pool D · Rd 6",teamA:"AD2",teamB:"AD3",winnerSlot:null,loserSlot:null},
-  {id:"sr1_1",block:8,time:"12:45pm",court:2,div:"social",phase:1,label:"Social Bracket R1",teamA:"S_SEED_1",teamB:"S_SEED_8",winnerSlot:"S_W1",loserSlot:"S_L1"},
-  {id:"sr1_2",block:8,time:"12:45pm",court:5,div:"social",phase:1,label:"Social Bracket R1",teamA:"S_SEED_4",teamB:"S_SEED_5",winnerSlot:"S_W2",loserSlot:"S_L2"},
+  {id:"sr1_1",block:8,time:"1:00pm",court:2,div:"social",phase:1,label:"Social Bracket R1",teamA:"S_SEED_1",teamB:"S_SEED_8",winnerSlot:"S_W1",loserSlot:"S_L1"},
+  {id:"sr1_2",block:8,time:"1:00pm",court:5,div:"social",phase:1,label:"Social Bracket R1",teamA:"S_SEED_4",teamB:"S_SEED_5",winnerSlot:"S_W2",loserSlot:"S_L2"},
   {id:"sr1_3",block:10,time:"1:15pm",court:2,div:"social",phase:1,label:"Social Bracket R1",teamA:"S_SEED_2",teamB:"S_SEED_7",winnerSlot:"S_W3",loserSlot:"S_L3"},
   {id:"sr1_4",block:10,time:"1:15pm",court:5,div:"social",phase:1,label:"Social Bracket R1",teamA:"S_SEED_3",teamB:"S_SEED_6",winnerSlot:"S_W4",loserSlot:"S_L4"},
-  {id:"ar1_1",block:8,time:"12:45pm",court:3,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_1",teamB:"A_SEED_16",winnerSlot:"A_W1",loserSlot:"A_L1"},
-  {id:"ar1_2",block:8,time:"12:45pm",court:6,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_8",teamB:"A_SEED_9",winnerSlot:"A_W2",loserSlot:"A_L2"},
-  {id:"ar1_3",block:8,time:"12:45pm",court:7,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_5",teamB:"A_SEED_12",winnerSlot:"A_W3",loserSlot:"A_L3"},
-  {id:"ar1_4",block:8,time:"12:45pm",court:8,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_4",teamB:"A_SEED_13",winnerSlot:"A_W4",loserSlot:"A_L4"},
-  {id:"ar1_5",block:8,time:"12:45pm",court:9,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_2",teamB:"A_SEED_15",winnerSlot:"A_W5",loserSlot:"A_L5"},
+  {id:"ar1_1",block:8,time:"1:00pm",court:3,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_1",teamB:"A_SEED_16",winnerSlot:"A_W1",loserSlot:"A_L1"},
+  {id:"ar1_2",block:8,time:"1:00pm",court:6,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_8",teamB:"A_SEED_9",winnerSlot:"A_W2",loserSlot:"A_L2"},
+  {id:"ar1_3",block:8,time:"1:00pm",court:7,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_5",teamB:"A_SEED_12",winnerSlot:"A_W3",loserSlot:"A_L3"},
+  {id:"ar1_4",block:8,time:"1:00pm",court:8,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_4",teamB:"A_SEED_13",winnerSlot:"A_W4",loserSlot:"A_L4"},
+  {id:"ar1_5",block:8,time:"1:00pm",court:9,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_2",teamB:"A_SEED_15",winnerSlot:"A_W5",loserSlot:"A_L5"},
   {id:"ar1_6",block:10,time:"1:15pm",court:3,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_7",teamB:"A_SEED_10",winnerSlot:"A_W6",loserSlot:"A_L6"},
   {id:"ar1_7",block:10,time:"1:15pm",court:6,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_6",teamB:"A_SEED_11",winnerSlot:"A_W7",loserSlot:"A_L7"},
   {id:"ar1_8",block:10,time:"1:15pm",court:7,div:"advanced",phase:1,label:"Adv Bracket R1",teamA:"A_SEED_3",teamB:"A_SEED_14",winnerSlot:"A_W8",loserSlot:"A_L8"},
@@ -406,20 +406,16 @@ const GAMES = [
   {id:"a_cr1_4",block:12,time:"1:45pm",court:8,div:"advanced",phase:2,label:"Adv Consolation R1",teamA:"A_L4",teamB:"A_L8",winnerSlot:"A_CW4",loserSlot:"A_CL4"},
   {id:"s_5th",block:13,time:"2:00pm",court:2,div:"social",phase:4,label:"Social 5th Place",teamA:"S_CW1",teamB:"S_CW2",winnerSlot:"S_5TH",loserSlot:"S_6TH"},
   {id:"s_7th",block:13,time:"2:00pm",court:5,div:"social",phase:4,label:"Social 7th Place",teamA:"S_CL1",teamB:"S_CL2",winnerSlot:"S_7TH",loserSlot:"S_8TH"},
-  {id:"a_r3_sf1",block:13,time:"2:00pm",court:3,div:"advanced",phase:4,label:"Adv SF",teamA:"A_WQF1",teamB:"A_WQF2",winnerSlot:"A_SF1",loserSlot:"A_3RD_A"},
-  {id:"a_r3_sf2",block:13,time:"2:00pm",court:6,div:"advanced",phase:4,label:"Adv SF",teamA:"A_WQF3",teamB:"A_WQF4",winnerSlot:"A_SF2",loserSlot:"A_3RD_B"},
-  {id:"a_r3_5a",block:13,time:"2:00pm",court:7,div:"advanced",phase:4,label:"Adv 5th/9th bracket",teamA:"A_QFL1",teamB:"A_QFL2",winnerSlot:"A_5TH_A",loserSlot:"A_9TH_A"},
-  {id:"a_r3_5b",block:13,time:"2:00pm",court:8,div:"advanced",phase:4,label:"Adv 5th/9th bracket",teamA:"A_QFL3",teamB:"A_QFL4",winnerSlot:"A_5TH_B",loserSlot:"A_9TH_B"},
-  {id:"s_champ",block:14,time:"2:15pm",court:2,div:"social",phase:5,label:"🥇 Social Championship",teamA:"S_WF1",teamB:"S_WF2",winnerSlot:"S_1ST",loserSlot:"S_2ND"},
+  {id:"a_r3_sf1",block:13,time:"2:00pm",court:3,div:"advanced",phase:4,label:"Adv Winners SF",teamA:"A_WQF1",teamB:"A_WQF2",winnerSlot:"A_SF1",loserSlot:"A_3RD_A"},
+  {id:"a_r3_sf2",block:13,time:"2:00pm",court:6,div:"advanced",phase:4,label:"Adv Winners SF",teamA:"A_WQF3",teamB:"A_WQF4",winnerSlot:"A_SF2",loserSlot:"A_3RD_B"},
+  {id:"a_r3_csf1",block:13,time:"2:00pm",court:7,div:"advanced",phase:4,label:"Adv Winners SF",teamA:"A_CW1",teamB:"A_CW2",winnerSlot:"A_5TH_A",loserSlot:"A_9TH_A"},
+  {id:"a_r3_csf2",block:13,time:"2:00pm",court:8,div:"advanced",phase:4,label:"Adv Winners SF",teamA:"A_CW3",teamB:"A_CW4",winnerSlot:"A_5TH_B",loserSlot:"A_9TH_B"},
+  {id:"s_champ_g1",block:14,time:"2:15pm",court:2,div:"social",phase:5,label:"🥇 Social Championship",teamA:"S_WF1",teamB:"S_WF2",winnerSlot:"S_1ST",loserSlot:"S_2ND"},
   {id:"s_3rd",block:14,time:"2:15pm",court:5,div:"social",phase:5,label:"🥉 Social 3rd Place",teamA:"S_3RD_A",teamB:"S_3RD_B",winnerSlot:"S_3RD",loserSlot:"S_4TH"},
-  {id:"a_r3_7a",block:14,time:"2:15pm",court:3,div:"advanced",phase:4,label:"Adv 7th/11th bracket",teamA:"A_CW1",teamB:"A_CW2",winnerSlot:"A_7TH_A",loserSlot:"A_11TH_A"},
-  {id:"a_r3_7b",block:14,time:"2:15pm",court:6,div:"advanced",phase:4,label:"Adv 7th/11th bracket",teamA:"A_CW3",teamB:"A_CW4",winnerSlot:"A_7TH_B",loserSlot:"A_11TH_B"},
-  {id:"a_r3_13a",block:14,time:"2:15pm",court:7,div:"advanced",phase:4,label:"Adv 13th/15th bracket",teamA:"A_CL1",teamB:"A_CL2",winnerSlot:"A_13TH_A",loserSlot:"A_15TH_A"},
-  {id:"a_r3_13b",block:14,time:"2:15pm",court:8,div:"advanced",phase:4,label:"Adv 13th/15th bracket",teamA:"A_CL3",teamB:"A_CL4",winnerSlot:"A_13TH_B",loserSlot:"A_15TH_B"},
-  {id:"a_final",block:15,time:"2:30pm",court:3,div:"advanced",phase:5,label:"🏆 Adv Championship",teamA:"A_SF1",teamB:"A_SF2",winnerSlot:"A_1ST",loserSlot:"A_2ND"},
-  {id:"a_3rd",block:15,time:"2:30pm",court:6,div:"advanced",phase:5,label:"Adv 3rd Place",teamA:"A_3RD_A",teamB:"A_3RD_B",winnerSlot:"A_3RD",loserSlot:"A_4TH"},
-  {id:"a_5th",block:15,time:"2:30pm",court:7,div:"advanced",phase:5,label:"Adv 5th Place",teamA:"A_5TH_A",teamB:"A_5TH_B",winnerSlot:"A_5TH",loserSlot:"A_6TH"},
-  {id:"a_9th",block:15,time:"2:30pm",court:8,div:"advanced",phase:5,label:"Adv 9th Place",teamA:"A_9TH_A",teamB:"A_9TH_B",winnerSlot:"A_9TH",loserSlot:"A_10TH"},
+  {id:"a_3rd",block:15,time:"2:30pm",court:3,div:"advanced",phase:5,label:"🥉 Adv 3rd Place",teamA:"A_3RD_A",teamB:"A_3RD_B",winnerSlot:"A_3RD",loserSlot:"A_4TH"},
+  {id:"a_5th",block:15,time:"2:30pm",court:6,div:"advanced",phase:5,label:"Adv 5th Place",teamA:"A_5TH_A",teamB:"A_5TH_B",winnerSlot:"A_5TH",loserSlot:"A_6TH"},
+  {id:"a_9th",block:15,time:"2:30pm",court:7,div:"advanced",phase:5,label:"Adv 9th Place",teamA:"A_9TH_A",teamB:"A_9TH_B",winnerSlot:"A_9TH",loserSlot:"A_10TH"},
+  {id:"a_final",block:17,time:"3:00pm",court:3,div:"advanced",phase:5,label:"🏆 Adv Championship",teamA:"A_SF1",teamB:"A_SF2",winnerSlot:"A_1ST",loserSlot:"A_2ND"},
 ];
 
 const FIREBASE_URL = "https://qcs-tournament-default-rtdb.firebaseio.com";
@@ -540,6 +536,8 @@ function computeSeedings(){
     AA:['AA1','AA2','AA3','AA4'],AB:['AB1','AB2','AB3','AB4'],
     AC:['AC1','AC2','AC3','AC4'],AD:['AD1','AD2','AD3','AD4']
   };
+
+  // Sort each pool by W-L then point differential
   const sorted={};
   Object.entries(poolOrder).forEach(([pool,teams])=>{
     sorted[pool]=[...teams].filter(k=>!noShows.has(k)).sort((a,b)=>{
@@ -548,15 +546,41 @@ function computeSeedings(){
       return rb.pd-ra.pd;
     });
   });
+
+  // SOCIAL: collect finish-tier groups, sort each group by W then PD, assign seeds
+  // S1-S2 = pool 1sts ranked by record, S3-S4 = pool 2nds, etc.
+  const sPools=['SA','SB'];
   const sRanked=[];
-  for(let i=0;i<4;i++){
-    if(sorted.SA[i])sRanked.push(sorted.SA[i]);
-    if(sorted.SB[i])sRanked.push(sorted.SB[i]);
+  for(let tier=0;tier<4;tier++){
+    const tierTeams=[];
+    sPools.forEach(pool=>{ if(sorted[pool][tier]) tierTeams.push(sorted[pool][tier]); });
+    // Sort this tier's teams by W then PD across pools
+    tierTeams.sort((a,b)=>{
+      const ra=poolRecords[a],rb=poolRecords[b];
+      if(rb.w!==ra.w)return rb.w-ra.w;
+      return rb.pd-ra.pd;
+    });
+    tierTeams.forEach(k=>sRanked.push(k));
   }
   sRanked.forEach((k,i)=>{bracketSlots[`S_SEED_${i+1}`]=k;});
+
+  // ADVANCED: collect finish-tier groups, sort each group by W then PD, assign seeds
+  // Seeds 1-4 = pool 1sts ranked by record
+  // Seeds 5-8 = pool 2nds ranked by record
+  // Seeds 9-12 = pool 3rds ranked by record
+  // Seeds 13-16 = pool 4ths ranked by record
+  const aPools=['AA','AB','AC','AD'];
   const aRanked=[];
-  for(let i=0;i<4;i++){
-    ['AA','AB','AC','AD'].forEach(pool=>{if(sorted[pool][i])aRanked.push(sorted[pool][i]);});
+  for(let tier=0;tier<4;tier++){
+    const tierTeams=[];
+    aPools.forEach(pool=>{ if(sorted[pool][tier]) tierTeams.push(sorted[pool][tier]); });
+    // Sort this tier's teams by W then PD across pools
+    tierTeams.sort((a,b)=>{
+      const ra=poolRecords[a],rb=poolRecords[b];
+      if(rb.w!==ra.w)return rb.w-ra.w;
+      return rb.pd-ra.pd;
+    });
+    tierTeams.forEach(k=>aRanked.push(k));
   }
   aRanked.forEach((k,i)=>{bracketSlots[`A_SEED_${i+1}`]=k;});
 }
@@ -822,7 +846,7 @@ function renderGames(){
   document.getElementById('progFill').style.width=pct+'%';
   document.getElementById('sDone').textContent=done.length;
   document.getElementById('sLeft').textContent=total-done.length;
-  const phLabels=['Pool Play','Bracket R1','QF / Consol R1','Placement','Finals','🎉 Done!'];
+  const phLabels=['Pool Play','Bracket R1','QF / Consol R1','SF / Placement','Finals','🎉 Done!'];
   document.getElementById('sPhase').textContent=phLabels[Math.min(curPhase(),5)]||'';
   document.getElementById('raffleAlert').classList.toggle('show',curPhase()===3);
   const pills=document.querySelectorAll('.pp');
